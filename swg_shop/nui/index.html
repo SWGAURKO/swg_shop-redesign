@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESX Markets</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div v-if="showShop" class="market-container">
+            <div class="market-tablet" :data-market="shopData.type || 'regular'">
+                
+                <div class="categories-sidebar">
+                    <div class="category-item" 
+                         :class="{ active: selectedCategory === 'all' }" 
+                         @click="selectedCategory = 'all'">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    
+                    <div v-for="category in shopData.categories" 
+                         :key="category.id"
+                         class="category-item" 
+                         :class="{ active: selectedCategory === category.id }" 
+                         @click="selectedCategory = category.id">
+                        <i :class="category.icon"></i>
+                    </div>
+                </div>
+                
+                <div class="main-content">
+                    <div class="market-header">
+                        <div class="logo-section">
+                            <div class="market-logo">
+                                <img :src="shopData.logo" :alt="shopData.name" @error="handleImageError">
+                            </div>
+                            <h1 class="market-title">{{ shopData.name }}</h1>
+                        </div>
+                        
+                        <div class="money-info">
+                            <div class="money-item">
+                                <i class="fas fa-wallet"></i>
+                                <span>${{ formatNumber(playerData.money) }}</span>
+                            </div>
+                            <div v-if="shopData.type !== 'illegal'" class="money-item">
+                                <i class="fas fa-university"></i>
+                                <span>${{ formatNumber(playerData.bank) }}</span>
+                            </div>
+                            <div v-if="shopData.type === 'illegal'" class="money-item black-money">
+                                <i class="fas fa-money-bill"></i>
+                                <span>${{ formatNumber(playerData.blackMoney) }}</span>
+                            </div>
+                            <div class="money-item vcoins">
+                                <i class="fas fa-coins"></i>
+                                <span>{{ formatNumber(playerData.vCoins) }}</span>
+                            </div>
+                            
+                            <div class="cart-icon" @click="showCart = !showCart" :class="{ active: cart.length > 0 }">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                        </div>
+                        
+                        <button class="close-btn" @click="closeShop">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="search-section">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" v-model="searchQuery" placeholder="Search..." @input="performSearch">
+                        </div>
+                    </div>
+                    
+                    <div class="items-section">
+                        <div class="items-grid">
+                            <div v-for="item in filteredItems" :key="item.name" class="item-card" @click="addToCart(item)">
+                                <div class="item-image">
+                                    <img :src="`nui://qb-inventory/html/images/${item.name}.png`" 
+                                         :alt="item.label"
+                                         @error="handleImageError">
+                                </div>
+                                <div class="item-info">
+                                    <h3 class="item-name">{{ item.label }}</h3>
+                                    <div class="item-price" :class="{ vip: item.isVip }">
+                                        <i :class="item.isVip ? 'fas fa-coins' : 'fas fa-dollar-sign'"></i>
+                                        <span>{{ item.isVip ? item.vipPrice : item.price }}</span>
+                                    </div>
+                                </div>
+                                <div v-if="item.isVip" class="vip-badge">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div v-if="showCart" class="cart-overlay" @click="showCart = false">
+                    <div class="cart-panel" @click.stop>
+                        <div class="cart-header">
+                            <h2>Shopping Cart</h2>
+                            <button @click="showCart = false">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <div v-if="cart.length === 0" class="empty-cart">
+                            <i class="fas fa-shopping-cart"></i>
+                            <p>Your cart is empty</p>
+                        </div>
+                        
+                        <div v-else class="cart-content">
+                            <div class="cart-items">
+                                <div v-for="(cartItem, index) in cart" :key="index" class="cart-item">
+                                    <img :src="`nui://qb-inventory/html/images/${cartItem.item}.png`" 
+                                         :alt="cartItem.label"
+                                         @error="handleImageError">
+                                    <div class="cart-item-info">
+                                        <span class="cart-item-name">{{ cartItem.label }}</span>
+                                        <div class="cart-item-controls">
+                                            <button @click="updateCartQuantity(index, -1)">-</button>
+                                            <span>{{ cartItem.quantity }}</span>
+                                            <button @click="updateCartQuantity(index, 1)">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="cart-item-price" :class="{ vip: cartItem.isVip }">
+                                        <i :class="cartItem.isVip ? 'fas fa-coins' : 'fas fa-dollar-sign'"></i>
+                                        <span>{{ (cartItem.isVip ? cartItem.vipPrice : cartItem.price) * cartItem.quantity }}</span>
+                                    </div>
+                                    <button class="remove-item" @click="removeFromCart(index)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-section">
+                                <div class="total-price">
+                                    <div v-if="cartTotals.regular > 0">
+                                        <span>Total: ${{ formatNumber(cartTotals.regular) }}</span>
+                                    </div>
+                                    <div v-if="cartTotals.vip > 0" class="vip-total">
+                                        <i class="fas fa-coins"></i>
+                                        <span>{{ formatNumber(cartTotals.vip) }} Verona Coin-a</span>
+                                    </div>
+                                </div>
+                                
+                                <div v-if="shopData.type !== 'illegal' && cartTotals.regular > 0" class="payment-options">
+                                    <label class="payment-option" :class="{ selected: paymentMethod === 'cash' }">
+                                        <input type="radio" v-model="paymentMethod" value="cash" style="display: none;">
+                                        <div class="payment-icon">
+                                            <i class="fas fa-wallet"></i>
+                                        </div>
+                                        <span>Cash</span>
+                                    </label>
+                                    <label class="payment-option" :class="{ selected: paymentMethod === 'bank' }">
+                                        <input type="radio" v-model="paymentMethod" value="bank" style="display: none;">
+                                        <div class="payment-icon">
+                                            <i class="fas fa-university"></i>
+                                        </div>
+                                        <span>Card</span>
+                                    </label>
+                                </div>
+                                
+                                <button class="checkout-btn" @click="checkout" :disabled="!canCheckout">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Pay</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
