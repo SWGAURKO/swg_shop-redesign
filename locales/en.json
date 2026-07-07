@@ -1,0 +1,37 @@
+{
+  "market": {
+    "open": "Open Shop",
+    "close": "Close",
+    "cart": "Shopping Cart",
+    "empty_cart": "Your cart is empty",
+    "search": "Search items...",
+    "checkout": "Checkout",
+    "buy": "Buy",
+    "quantity": "Quantity",
+    "price": "Price",
+    "total": "Total",
+    "payment_method": "Payment Method",
+    "cash": "Cash",
+    "bank": "Bank",
+    "success": "Purchase successful!",
+    "error": "Purchase failed",
+    "not_enough_money": "Not enough money",
+    "not_enough_vcoins": "Not enough VIP coins",
+    "item_not_found": "Item not found"
+  },
+  "shops": {
+    "regular": "24/7 Market",
+    "ltd": "LTD Gas Station",
+    "liquor": "Liquor Store",
+    "illegal": "Black Market"
+  },
+  "categories": {
+    "food": "Food",
+    "snacks": "Snacks",
+    "drinks": "Drinks",
+    "weapons": "Weapons",
+    "illegal_items": "Illegal Items",
+    "drugs": "Drugs",
+    "equipment": "Equipment"
+  }
+}

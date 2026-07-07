@@ -1,0 +1,37 @@
+{
+  "market": {
+    "open": "Otvori Prodavnicu",
+    "close": "Zatvori",
+    "cart": "Korpa",
+    "empty_cart": "Vaša korpa je prazna",
+    "search": "Pretraži stavke...",
+    "checkout": "Finalizuj kupovinu",
+    "buy": "Kupi",
+    "quantity": "Količina",
+    "price": "Cena",
+    "total": "Ukupno",
+    "payment_method": "Način Plaćanja",
+    "cash": "Gotovina",
+    "bank": "Banka",
+    "success": "Kupovina uspešna!",
+    "error": "Kupovina neuspešna",
+    "not_enough_money": "Nemate dovoljno novca",
+    "not_enough_vcoins": "Nemate dovoljno VIP kovanica",
+    "item_not_found": "Stavka nije pronađena"
+  },
+  "shops": {
+    "regular": "24/7 Tržnica",
+    "ltd": "LTD Benzinska Stanica",
+    "liquor": "Likerna Prodavnica",
+    "illegal": "Crni Tržić"
+  },
+  "categories": {
+    "food": "Hrana",
+    "snacks": "Grickalice",
+    "drinks": "Pića",
+    "weapons": "Oružje",
+    "illegal_items": "Ilegalne Stvari",
+    "drugs": "Droge",
+    "equipment": "Oprema"
+  }
+}
